@@ -126,6 +126,11 @@
     SERVER_END
     ```
 
+- Public port:
+    ```
+    sudo ufw allow 3306
+    ```
+
 ## Resource
 https://drive.google.com/drive/folders/1mjiKzDl3Zqh3r1lO3hnZ_6Q1sYHwkkvi?usp=sharing
 
