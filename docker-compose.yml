@@ -1,29 +1,40 @@
-version: "3.9"
+version: '3.9'
+
 services:
-  mysql:
-    image: mysql
-    restart: always
-    volumes:
-       - mysql_data:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_HOST: 0.0.0.0
-    ports:
-      - "3306:3306"
-    secrets:
-      - mysql_password
-      - mysql_root_password
-    networks:
-      - tlbb-server
+        ######################################################################################
+        #                     MYSQL for local (Remove if run on VPS)                         #
+        ######################################################################################
+        tlbbdb:
+                image: mysql:5.7
+                ports:
+                        - "3306:3306"
+                volumes:
+                        - ./tlbbdb/database:/var/lib/mysql
+                environment:
+                        MYSQL_ROOT_PASSWORD: "tlbb1234"
+                        MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+                        MYSQL_DATABASE: "tlbbdb"
+                restart: always
 
-secrets:
-  mysql_root_password:
-    file: ./secrets/mysql_root_password.txt
-  mysql_password:
-    file: ./secrets/mysql_password.txt
-volumes:
-  mysql_data:
-    file: ./data/msql_data
-networks:
-  tlbb-server:
-
-
+        ######################################################################################
+        #                                  GameServer                                        #
+        ######################################################################################
+        gs:
+                build:
+                        context: ./gameserver
+                        dockerfile: Dockerfile
+                ports:
+                        - "7384:7384"
+                        - "3731:3731"
+                volumes:
+                        - ./server:/home/tlbb
+                        - ./gameserver/config/odbc.ini:/etc/odbc.ini
+                links: # Remove if run on vps
+                        - tlbbdb # Remove if run on vps
+                environment:
+                        - SET_CONTAINER_TIMEZONE=true
+                cap_add:
+                        - ALL
+                privileged: true
+                restart: always
+        
